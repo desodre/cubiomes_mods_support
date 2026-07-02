@@ -1,9 +1,12 @@
 #include "biomes.h"
 #include <inttypes.h>
+#include <string.h>
+#include <stddef.h>
 
 
 int biomeExists(int mc, int id)
 {
+    if (isCustomBiomeId(id)) return 1;
     if (mc >= MC_1_18)
     {
         if (id >= soul_sand_valley && id <= basalt_deltas)
@@ -181,6 +184,10 @@ int biomeExists(int mc, int id)
 
 int isOverworld(int mc, int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? (info->dimension == DIM_OVERWORLD) : 0;
+    }
     if (!biomeExists(mc, id))
         return 0;
 
@@ -210,6 +217,10 @@ int isOverworld(int mc, int id)
 
 int getDimension(int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? info->dimension : DIM_OVERWORLD;
+    }
     if (id >= small_end_islands && id <= end_barrens) return DIM_END;
     if (id >= soul_sand_valley && id <= basalt_deltas) return DIM_NETHER;
     if (id == the_end) return DIM_END;
@@ -219,6 +230,7 @@ int getDimension(int id)
 
 int getMutated(int mc, int id)
 {
+    if (isCustomBiomeId(id)) return none;
     switch (id)
     {
     case plains:                    return sunflower_plains;
@@ -252,6 +264,10 @@ int getMutated(int mc, int id)
 
 int getCategory(int mc, int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? info->category : none;
+    }
     switch (id)
     {
     case beach:
@@ -381,6 +397,10 @@ int areSimilar(int mc, int id1, int id2)
 
 int isMesa(int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? (info->category == badlands) : 0;
+    }
     switch (id)
     {
     case badlands:
@@ -397,6 +417,10 @@ int isMesa(int id)
 
 int isShallowOcean(int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? (info->isOceanic && strstr(info->name, "deep") == NULL) : 0;
+    }
     const uint64_t shallow_bits =
             (1ULL << ocean) |
             (1ULL << frozen_ocean) |
@@ -408,6 +432,10 @@ int isShallowOcean(int id)
 
 int isDeepOcean(int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? (info->isOceanic && strstr(info->name, "deep") != NULL) : 0;
+    }
     const uint64_t deep_bits =
             (1ULL << deep_ocean) |
             (1ULL << deep_warm_ocean) |
@@ -419,6 +447,10 @@ int isDeepOcean(int id)
 
 int isOceanic(int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? info->isOceanic : 0;
+    }
     const uint64_t ocean_bits =
             (1ULL << ocean) |
             (1ULL << frozen_ocean) |
@@ -435,6 +467,10 @@ int isOceanic(int id)
 
 int isSnowy(int id)
 {
+    if (isCustomBiomeId(id)) {
+        const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+        return info ? info->isSnowy : 0;
+    }
     switch (id)
     {
     case frozen_ocean:

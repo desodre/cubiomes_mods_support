@@ -201,5 +201,7 @@ int isSnowy(int id);
 }
 #endif
 
+#include "dynamic_registry.h"
+
 #endif /* BIOMES_H_ */
 

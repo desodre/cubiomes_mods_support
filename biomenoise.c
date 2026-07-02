@@ -1,4 +1,5 @@
 #include "biomenoise.h"
+#include "tree_builder.h"
 
 #include "tables/btree18.h"
 #include "tables/btree192.h"
@@ -1134,6 +1135,7 @@ void initBiomeNoise(BiomeNoise *bn, int mc)
 
     bn->sp = sp;
     bn->mc = mc;
+    bn->customTree = NULL;
 }
 
 
@@ -1186,7 +1188,7 @@ int sampleBiomeNoise(const BiomeNoise *bn, int64_t *np, int x, int y, int z,
 
     int id = none;
     if (!(sample_flags & SAMPLE_NO_BIOME))
-        id = climateToBiome(bn->mc, (const uint64_t*)p_np, dat);
+        id = climateToBiome(bn->mc, (const uint64_t*)p_np, dat, bn->customTree);
     return id;
 }
 
@@ -1431,8 +1433,11 @@ int get_resulting_node(const uint64_t np[6], const BiomeTree *bt, int idx,
 }
 
 ATTR(hot, flatten)
-int climateToBiome(int mc, const uint64_t np[6], uint64_t *dat)
+int climateToBiome(int mc, const uint64_t np[6], uint64_t *dat, const struct KdTree *customTree)
 {
+    if (customTree) {
+        return searchKdTree(customTree, np);
+    }
     static const BiomeTree btree18 = {
         btree18_steps, &btree18_param[0][0], btree18_nodes, btree18_order,
         sizeof(btree18_nodes) / sizeof(uint64_t)

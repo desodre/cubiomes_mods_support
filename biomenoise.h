@@ -125,6 +125,8 @@ enum
     NP_WEIRDNESS        = 5,
     NP_MAX
 };
+struct KdTree;
+
 // Overworld biome generator for 1.18+
 STRUCT(BiomeNoise)
 {
@@ -134,6 +136,7 @@ STRUCT(BiomeNoise)
     SplineStack ss;
     int nptype;
     int mc;
+    const struct KdTree *customTree;
 };
 // Overworld biome generator for pre-Beta 1.8
 STRUCT(BiomeNoiseBeta)
@@ -261,7 +264,7 @@ int getOldBetaBiome(float t, float h);
  * Uses the global biome tree definitions (see tables/btreeXX.h)
  * to map a noise point (i.e. climate) to the corresponding overworld biome.
  */
-int climateToBiome(int mc, const uint64_t np[6], uint64_t *dat);
+int climateToBiome(int mc, const uint64_t np[6], uint64_t *dat, const struct KdTree *customTree);
 
 /**
  * Initialize BiomeNoise for only a single climate parameter.

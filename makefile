@@ -30,7 +30,7 @@ release: CFLAGS += -fPIC
 endif
 
 
-libcubiomes: noise.o biomes.o layers.o biomenoise.o generator.o finders.o util.o quadbase.o
+libcubiomes: noise.o biomes.o layers.o biomenoise.o generator.o finders.o util.o quadbase.o dynamic_registry.o json_parser.o tree_builder.o
 	$(AR) $(ARFLAGS) libcubiomes.a $^
 
 finders.o: finders.c finders.h
@@ -60,6 +60,16 @@ util.o: util.c util.h
 quadbase.o: quadbase.c quadbase.h
 	$(CC) -c $(CFLAGS) $<
 
+dynamic_registry.o: dynamic_registry.c dynamic_registry.h
+	$(CC) -c $(CFLAGS) $<
+
+json_parser.o: json_parser.c json_parser.h
+	$(CC) -c $(CFLAGS) $<
+
+tree_builder.o: tree_builder.c tree_builder.h
+	$(CC) -c $(CFLAGS) $<
+
 clean:
 	$(RM) *.o *.a
+
 

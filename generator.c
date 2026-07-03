@@ -766,6 +766,56 @@ int mapApproxHeight(float *y, int *ids, const Generator *g, const SurfaceNoise *
     return 0;
 }
 
+#include "json_parser.h"
+#include "tree_builder.h"
+#include "dynamic_registry.h"
+
+int getGeneratorSize()
+{
+    return sizeof(Generator);
+}
+
+void* loadCustomTreeFromDatapack(const char *jsonPath)
+{
+    BiomeParameterPoint *points = NULL;
+    int count = 0;
+    int parsed = loadDatapackBiomeSource(jsonPath, &points, &count);
+    if (parsed <= 0 || !points) {
+        return NULL;
+    }
+    KdTree *tree = buildKdTree(points, count);
+    free(points);
+    return tree;
+}
+
+void freeCustomTree(void *customTree)
+{
+    if (customTree) {
+        freeKdTree((KdTree *)customTree);
+    }
+}
+
+void setGeneratorCustomTree(Generator *g, void *customTree)
+{
+    if (g->mc >= MC_1_18) {
+        g->bn.customTree = (const struct KdTree *)customTree;
+    }
+}
+
+const char* getCustomBiomeName(int id)
+{
+    const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+    return info ? info->name : NULL;
+}
+
+int getCustomBiomeColor(int id)
+{
+    const CustomBiomeInfo *info = getCustomBiomeInfo(id);
+    if (!info) return 0x8DB360;
+    return (info->color[0] << 16) | (info->color[1] << 8) | info->color[2];
+}
+
+
 
 
 

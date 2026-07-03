@@ -136,9 +136,17 @@ int mapApproxHeight(float *y, int *ids, const Generator *g,
     const SurfaceNoise *sn, int x, int z, int w, int h);
 
 
+int getGeneratorSize();
+void* loadCustomTreeFromDatapack(const char *jsonPath);
+void freeCustomTree(void *customTree);
+void setGeneratorCustomTree(Generator *g, void *customTree);
+const char* getCustomBiomeName(int id);
+int getCustomBiomeColor(int id);
+
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif /* GENERATOR_H_ */
 

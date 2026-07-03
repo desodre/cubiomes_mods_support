@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
+
 
 typedef enum {
     JSON_EOF,
@@ -54,6 +56,11 @@ static void nextToken(JSONTokenizer *tok) {
                 tok->ptr--; // go back
                 char *end;
                 tok->num_val = strtod(tok->ptr, &end);
+                if (end == tok->ptr) {
+                    tok->ptr++; // force advance to prevent infinite loop
+                    tok->type = JSON_ERROR;
+                    return;
+                }
                 tok->ptr = end;
                 tok->type = JSON_NUMBER;
                 return;
@@ -200,6 +207,14 @@ int loadDatapackBiomeSource(const char *jsonPath, BiomeParameterPoint **pointsOu
     buf[bytesRead] = '\0';
     fclose(f);
 
+    char *oldLocale = setlocale(LC_NUMERIC, NULL);
+    char savedLocale[64] = "C";
+    if (oldLocale) {
+        strncpy(savedLocale, oldLocale, sizeof(savedLocale) - 1);
+        savedLocale[sizeof(savedLocale) - 1] = '\0';
+    }
+    setlocale(LC_NUMERIC, "C");
+
     JSONTokenizer tok;
     tok.ptr = buf;
     nextToken(&tok);
@@ -228,6 +243,7 @@ int loadDatapackBiomeSource(const char *jsonPath, BiomeParameterPoint **pointsOu
     if (!found_biomes) {
         free(points);
         free(buf);
+        setlocale(LC_NUMERIC, savedLocale);
         return -1;
     }
 
@@ -329,5 +345,6 @@ int loadDatapackBiomeSource(const char *jsonPath, BiomeParameterPoint **pointsOu
     free(buf);
     *pointsOut = points;
     *countOut = count;
+    setlocale(LC_NUMERIC, savedLocale);
     return count;
 }
